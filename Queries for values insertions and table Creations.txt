@@ -1,0 +1,100 @@
+SQL> create table Student
+  2  (sid number primary key,
+  3  sname varchar2(20) unique not null,
+  4  mobile number unique);
+
+insert into student
+values(100,'sachin',7845986523);
+
+insert into student
+values(200,'rahul',74512698221);
+
+insert into student
+values(300,'sanjay',7845986457);
+
+insert into student
+values(400,'omkar',7845986265);
+
+insert into student
+values(500,'jay',7845986741);
+
+
+
+------------------------------------------------------------------------------
+SQL> create table course
+  2  (cid number primary key,
+  3  cname varchar2(20) unique,
+  4  duration number);
+
+
+insert into course
+values(11,'java',300);
+
+insert into course
+values(12,'c++',250);
+
+insert into course
+values(13,'.net',89);
+
+insert into course
+values(14,'python',600);
+
+insert into course
+values(500,'jay',120);
+
+
+
+
+-----------------------------------------------------------------------------------
+SQL> create table stud_course
+  2  (cid number,
+  3  sid number,
+  4  marks number check (marks>0),
+  5  constraint fk_num primary key (cid,sid),
+  6  constraint fk_cid1 foreign key (cid) references course (cid),
+  7  constraint fk_sid1 foreign key (sid) references Student (sid)
+  8  );
+
+
+insert into stud_course values(11,100,78);
+insert into stud_course values(12,300,89);
+insert into stud_course values(13,400,76);
+insert into stud_course values(12,100,32);
+insert into stud_course values(14,500,71);
+insert into stud_course values(500,200,69);
+
+---------------------------------------------------------------------------------------------
+
+SQL> select *from Student;
+
+            SID SNAME                         MOBILE
+--------------- -------------------- ---------------
+            100 sachin                    7845986523
+            200 rahul                    74512698221
+            300 sanjay                    7845986457
+            400 omkar                     7845986265
+            500 jay                       7845986741
+
+SQL> select *from course;
+
+            CID CNAME                       DURATION
+--------------- -------------------- ---------------
+             11 java                             300
+             12 c++                              250
+             13 .net                              89
+             14 python                           600
+            500 jay                              120
+
+
+SQL> select *from stud_course
+  2  /
+
+            CID             SID           MARKS
+--------------- --------------- ---------------
+             11             100              78
+             12             300              89
+             13             400              76
+             12             100              32
+             14             500              71
+            500             200              69
+

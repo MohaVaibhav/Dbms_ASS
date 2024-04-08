@@ -1,0 +1,386 @@
+
+     ACTNO CNAME1               BNAME1                   AMOUNT ADATE
+---------- -------------------- -------------------- ---------- --------------------
+       100 anil                 vrce bank                  1000 1995-03-01
+       101 sunil                ajni bank                  5000 1996-01-04
+       102 mehul                chandani bank              3500 1995-11-17
+       103 pramod               mg road bank               1200 1995-11-17
+       104 sandip               andheri bank               3000 1995-03-27
+       105 shivani              virar bank                 1000 0000-00-00
+       106 madhuri              ajni bank                  2000 1995-12-05
+       107 kranti               nehru palace bank          5000 1995-07-02
+       108 naren                powai bank                 7000 1995-08-02
+
+9 rows selected.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create table borrow(
+  2  loanno number primary key,
+  3  cname2,
+  4  bname2,
+  5  amount number,
+  6  constraint fk91 foreign key (cname2) references customer (cname),
+  7* constraint fk92 foreign key (bname2) references bank (bname))
+SQL> /
+
+Table created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  insert all
+  2  into borrow (loanno,cname2,bname2,amount) values (201,'anil','vrce bank',5000)
+  3  into borrow (loanno,cname2,bname2,amount) values (206,'mehul','ajni bank',1000)
+  4  into borrow (loanno,cname2,bname2,amount) values (311,'sunil','dharampeth bank',3000)
+  5  into borrow (loanno,cname2,bname2,amount) values (321,'madhuri','andheri bank',2000)
+  6  into borrow (loanno,cname2,bname2,amount) values (375,'pramod','virar bank',8000)
+  7* into borrow (loanno,cname2,bname2,amount) values (481,'kranti','nehru palace bank',3000)
+SQL> /
+into borrow (loanno,cname2,bname2,amount) values (481,'kranti','nehru palace bank',3000)
+                                                                                       *
+ERROR at line 7:
+ORA-00928: missing SELECT keyword
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  insert all
+  2  into borrow (loanno,cname2,bname2,amount) values (201,'anil','vrce bank',5000)
+  3  into borrow (loanno,cname2,bname2,amount) values (206,'mehul','ajni bank',1000)
+  4  into borrow (loanno,cname2,bname2,amount) values (311,'sunil','dharampeth bank',3000)
+  5  into borrow (loanno,cname2,bname2,amount) values (321,'madhuri','andheri bank',2000)
+  6  into borrow (loanno,cname2,bname2,amount) values (375,'pramod','virar bank',8000)
+  7  into borrow (loanno,cname2,bname2,amount) values (481,'kranti','nehru palace bank',3000)
+  8* select 1 from dual
+SQL> /
+
+6 rows created.
+
+SQL> select *from borrow;
+
+    LOANNO CNAME2               BNAME2                   AMOUNT
+---------- -------------------- -------------------- ----------
+       201 anil                 vrce bank                  5000
+       206 mehul                ajni bank                  1000
+       311 sunil                dharampeth bank            3000
+       321 madhuri              andheri bank               2000
+       375 pramod               virar bank                 8000
+       481 kranti               nehru palace bank          3000
+
+6 rows selected.
+
+========================================================================================================================================
+1)
+
+Wrote file afiedt.buf
+
+  1  select actno,d.cname1,d.bname1,city,bcity
+  2  from deposit d inner join customer c
+  3  on d.cname1=c.cname inner join bank b
+  4  on d.bname1=b.bname
+  5* where city='mumbai' and bcity='delhi'
+SQL> /
+
+     ACTNO CNAME1               BNAME1               CITY                 BCITY
+---------- -------------------- -------------------- -------------------- --------------------
+       107 kranti               nehru palace bank    mumbai               delhi
+
+
+======================================================================================================================
+
+2)
+
+
+
+  1  select actno,cname1,bname1,bcity
+  2  from deposit d inner join bank b
+  3  on d.bname1=b.bname
+  4* where bcity=(select city from customer where cname='sunil')
+SQL> /
+
+     ACTNO CNAME1               BNAME1               BCITY
+---------- -------------------- -------------------- --------------------
+       102 mehul                chandani bank        delhi
+       107 kranti               nehru palace bank    delhi
+
+
+---------------------OR---------------------------
+
+  1  select actno,cname1,bname1
+  2  from deposit
+  3* where bname1=(select bname1 from deposit where cname1='sunil')
+SQL> /
+
+     ACTNO CNAME1               BNAME1
+---------- -------------------- --------------------
+       101 sunil                ajni bank
+       106 madhuri              ajni bank
+
+========================================================================================================================
+
+3)List LoanNO and Loan City of Borrowers Having the Same Branch as that of Depositors SUNIL
+
+Wrote file afiedt.buf
+
+  1  select loanno,cname2,bname2
+  2  from borrow b inner join deposit d
+  3  on b.cname2=d.cname1
+  4* where bname2=(select bname1 from deposit where cname1='sunil')
+SQL> /
+
+    LOANNO CNAME2               BNAME2
+---------- -------------------- --------------------
+       206 mehul                ajni bank
+
+-----------------------------or------------------------------------------
+
+ 1  select loanno,actno,cname2,bname2,bcity
+  2  from borrow b inner join deposit d
+  3  on b.cname2=d.cname1 inner join bank k
+  4  on b.bname2=k.bname
+  5* where bcity=(select bcity from bank where bname=(select bname1 from deposit where cname1='sunil'))
+SQL> /
+
+    LOANNO      ACTNO CNAME2               BNAME2               BCITY
+---------- ---------- -------------------- -------------------- --------------------
+       201        100 anil                 vrce bank            nagpur
+       311        101 sunil                dharampeth bank      nagpur
+       206        102 mehul                ajni bank            nagpur
+
+
+
+=======================================================================================================================
+
+4)List LoanNO,Loan City,Account NO and Deposit City of Customers Living in NAGPUR.
+
+
+  1  select loanno,actno,cname2,bname2,bcity
+  2  from deposit d inner join borrow b
+  3  on d.cname1=b.cname2 inner join bank k
+  4  on d.bname1=k.bname
+  5* where bcity='nagpur'
+SQL> /
+
+    LOANNO      ACTNO CNAME2               BNAME2               BCITY
+---------- ---------- -------------------- -------------------- --------------------
+       201        100 anil                 vrce bank            nagpur
+       311        101 sunil                dharampeth bank      nagpur
+       321        106 madhuri              andheri bank         nagpur
+
+---------------------------------------or-------------------------------------------------------
+
+
+  1  select loanno,actno,cname2,bname2,city
+  2  from deposit d inner join borrow b
+  3  on d.cname1=b.cname2 inner join customer c
+  4  on b.cname2=c.cname
+  5* where city='nagpur'
+SQL> /
+
+    LOANNO      ACTNO CNAME2               BNAME2               CITY
+---------- ---------- -------------------- -------------------- --------------------
+       375        103 pramod               virar bank           nagpur
+       321        106 madhuri              andheri bank         nagpur
+
+
+============================================================================================================================
+
+
+5)  List Deposit Details and Loan details of Customers in the City where Pramod is Living.
+
+
+  1  select loanno,actno,cname2,bname2,bcity
+  2  from deposit d inner join borrow b
+  3  on d.cname1=b.cname2 inner join bank k
+  4  on b.bname2=k.bname
+  5* where bcity=(select city from customer where cname='pramod')
+SQL> /
+
+    LOANNO      ACTNO CNAME2               BNAME2               BCITY
+---------- ---------- -------------------- -------------------- --------------------
+       201        100 anil                 vrce bank            nagpur
+       311        101 sunil                dharampeth bank      nagpur
+       206        102 mehul                ajni bank            nagpur
+
+
+
+
+
+=================================================================================================================
+
+
+6)List Names of Customers who are Depositors and have Same Branch City as that of SUNIL.
+
+
+
+
+  1  select  actno,cname1, bname1
+  2  from deposit d inner join bank b
+  3  on d.bname1=b.bname
+  4* where bcity=(select city from customer where cname='sunil')
+SQL> /
+
+     ACTNO CNAME1               BNAME1
+---------- -------------------- --------------------
+       102 mehul                chandani bank
+       107 kranti               nehru palace bank
+
+
+========================================================================================================================
+7) List Names of Depositors Having Same Living City as that of SHIVANI and Having Deposit City Greater than 2000.
+
+
+  1  select actno,cname1,bname1,bcity
+  2  from deposit d inner join bank b
+  3  on d.bname1=b.bname
+  4* where bcity=(select city from customer where cname='shivani') and amount>2000
+SQL> /
+
+     ACTNO CNAME1               BNAME1               BCITY
+---------- -------------------- -------------------- --------------------
+       104 sandip               andheri bank         mumbai
+       108 naren                powai bank           mumbai
+
+=================================================================================================================
+
+8)List Names of Borrowers Having Deposit Amount Greater than 1000 and Loan Amount Greater than 2000.
+
+
+
+  1  select actno,cname1,bname1,loanno
+  2  from deposit d inner join borrow b
+  3  on d.cname1=b.cname2
+  4* where amount>1000 and loan_amount>2000
+SQL> /
+
+     ACTNO CNAME1               BNAME1                   LOANNO
+---------- -------------------- -------------------- ----------
+       101 sunil                ajni bank                   311
+       103 pramod               mg road bank                375
+       107 kranti               nehru palace bank           481
+
+
+==================================================================================================================
+
+9)List Names of Depositors Having the Same Branch as the Branch of SUNIL.
+
+
+SQL> select *from deposit
+  2  where bname1=(select bname1 from deposit where cname1='sunil');
+
+     ACTNO CNAME1               BNAME1                   AMOUNT ADATE
+---------- -------------------- -------------------- ---------- --------------------
+       101 sunil                ajni bank                  5000 1996-01-04
+       106 madhuri              ajni bank                  2000 1995-12-05
+
+===========================================================================================================
+
+10)List Names of Borrowers Having Loan Amount Greater than the Loan Amount of ANIL
+
+
+SQL> select *from borrow
+  2  where loan_amount >(select loan_amount from borrow where cname2='anil');
+
+    LOANNO CNAME2               BNAME2               LOAN_AMOUNT
+---------- -------------------- -------------------- -----------
+       375 pramod               virar bank                  8000
+
+========================================================================================================
+
+11)List LoanNO,Loan City,Account NO and Deposit City of Customers Having Deposit Branch Located in DELHI.
+
+
+
+  1  select loanno,actno,cname2,bname2,bcity
+  2  from borrow b inner join deposit d
+  3  on b.cname2=d.cname1 inner join bank k
+  4  on b.bname2=k.bname
+  5* where bcity='delhi'
+SQL> /
+
+    LOANNO      ACTNO CNAME2               BNAME2               BCITY
+---------- ---------- -------------------- -------------------- --------------------
+       481        107 kranti               nehru palace bank    delhi
+
+==========================================================================================================
+
+12)List LoanNO,Loan City,Account NO,Deposit City,Branch Name,Branch City and Living City of Pramod.
+
+  1  select loanno,actno,cname1,bname1,bcity
+  2  from borrow b inner join deposit d
+  3  on b.cname2=d.cname1 inner join bank k
+  4  on b.bname2=k.bname
+  5* where bcity=(select city from customer where cname='pramod')
+SQL> /
+
+    LOANNO      ACTNO CNAME1               BNAME1               BCITY
+---------- ---------- -------------------- -------------------- --------------------
+       201        100 anil                 vrce bank            nagpur
+       311        101 sunil                ajni bank            nagpur
+       206        102 mehul                chandani bank        nagpur
+
+=============================================================================================================
+
+13)List Deposit Details and Loan details of Customers in the City where Pramod is Living.
+
+
+
+  1  select loanno,actno,cname1,bname1,city
+  2  from borrow b inner join deposit d
+  3  on b.cname2=d.cname1 inner join customer c
+  4  on b.cname2=c.cname
+  5* where city=(select city from customer where cname='pramod')
+SQL> /
+
+    LOANNO      ACTNO CNAME1               BNAME1               CITY
+---------- ---------- -------------------- -------------------- --------------------
+       375        103 pramod               mg road bank         nagpur
+       321        106 madhuri              ajni bank            nagpur
+
+
+=================================================================================================================
+
+14)List Names of Depositors Having balance Greater than 1000 and group by branch name
+
+Wrote file afiedt.buf
+
+  1  select bname1
+  2  from deposit
+  3  where amount>1000
+  4* group by bname1
+SQL> /
+
+BNAME1
+--------------------
+powai bank
+ajni bank
+nehru palace bank
+chandani bank
+andheri bank
+mg road bank
+
+6 rows selected.
+
+=======================================================================================================================
+
+15) List LoanNO,Loan City,Account NO,Deposit City,Branch Name,Branch City and Living City of Pramod
+
+
+
+  1  select loanno,actno,bname2,cname2,bcity
+  2  from borrow b inner join deposit d
+  3  on b.cname2=d.cname1 inner join bank k
+  4  on b.bname2=k.bname
+  5* where bcity=(select city from customer where cname='pramod')
+SQL> /
+
+    LOANNO      ACTNO BNAME2               CNAME2               BCITY
+---------- ---------- -------------------- -------------------- --------------------
+       201        100 vrce bank            anil                 nagpur
+       311        101 dharampeth bank      sunil                nagpur
+       206        102 ajni bank            mehul                nagpur
+
+

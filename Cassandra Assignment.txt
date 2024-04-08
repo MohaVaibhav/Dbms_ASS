@@ -1,0 +1,256 @@
+cqlsh:iacsd0923>
+cqlsh:iacsd0923> insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(1,'rahul',{9423,7345},('rk@g.com','cj@g.com'),{'honda':11,'hero':12},['Reading','Cooking']);
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname | email                    | hobbies                | mobile       | purchaseveh
+-----+-------+--------------------------+------------------------+--------------+---------------------------
+   1 | rahul | ('rk@g.com', 'cj@g.com') | ['Reading', 'Cooking'] | {7345, 9423} | {'hero': 12, 'honda': 11}
+
+cqlsh:iacsd0923> create table store(
+             ... cid int primary key,
+             ... cname text,
+             ... mobile set<int>,
+             ... email tuple<text,text>,
+             ... purchaseveh map<text,int>,
+             ... hobbies list<text>);
+
+
+
+cqlsh:iacsd0923> insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(2,'suresh',{9400,7589},('sk@g.com','yu@g.com'),{'splendor':11,'pular':12},['riding']);
+cqlsh:iacsd0923> insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(3,'rajesh',{8769,0089},('s@g.com','u@g.com'),{'acess':11,'pular':12},['treaking']);
+cqlsh:iacsd0923> insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(4,'ramesh',{7810,4489},('jk@g.com','ty@g.com'),{'tvs':11,'kia':12},['photograpy',sleeping]);
+SyntaxException: line 2:96 no viable alternative at input ']' (...11,'kia':12},['photograpy',[sleeping]]...)
+cqlsh:iacsd0923> insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(4,'ramesh',{7810,4489},('jk@g.com','ty@g.com'),{'tvs':11,'kia':12},['photograpy','sleeping']);
+cqlsh:iacsd0923> insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(5,'jitesh',{8888,9999},('qt@g.com','ur@g.com'),{'hero':13,'creata':18},['photograpy','sleeping']);
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname  | email                    | hobbies                    | mobile       | purchaseveh
+-----+--------+--------------------------+----------------------------+--------------+-------------------------------
+   5 | jitesh | ('qt@g.com', 'ur@g.com') | ['photograpy', 'sleeping'] | {8888, 9999} |    {'creata': 18, 'hero': 13}
+   1 |  rahul | ('rk@g.com', 'cj@g.com') |     ['Reading', 'Cooking'] | {7345, 9423} |     {'hero': 12, 'honda': 11}
+   2 | suresh | ('sk@g.com', 'yu@g.com') |                 ['riding'] | {7589, 9400} | {'pular': 12, 'splendor': 11}
+   4 | ramesh | ('jk@g.com', 'ty@g.com') | ['photograpy', 'sleeping'] | {4489, 7810} |        {'kia': 12, 'tvs': 11}
+   3 | rajesh |   ('s@g.com', 'u@g.com') |               ['treaking'] |   {89, 8769} |    {'acess': 11, 'pular': 12}
+
+=========================================================================================================================================================
+
+cqlsh:iacsd0923> update store
+             ... set hobbies=hobbies+['design','drawing']
+             ... where cid=2;
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname  | email                    | hobbies                         | mobile       | purchaseveh
+-----+--------+--------------------------+---------------------------------+--------------+-------------------------------
+   5 | jitesh | ('qt@g.com', 'ur@g.com') |      ['photograpy', 'sleeping'] | {8888, 9999} |    {'creata': 18, 'hero': 13}
+   1 |  rahul | ('rk@g.com', 'cj@g.com') |          ['Reading', 'Cooking'] | {7345, 9423} |     {'hero': 12, 'honda': 11}
+   2 | suresh | ('sk@g.com', 'yu@g.com') | ['riding', 'design', 'drawing'] | {7589, 9400} | {'pular': 12, 'splendor': 11}
+   4 | ramesh | ('jk@g.com', 'ty@g.com') |      ['photograpy', 'sleeping'] | {4489, 7810} |        {'kia': 12, 'tvs': 11}
+  12 |   null |                     null |           ['design', 'drawing'] |         null |                          null
+   3 | rajesh |   ('s@g.com', 'u@g.com') |                    ['treaking'] |   {89, 8769} |    {'acess': 11, 'pular': 12}
+
+(6 rows)
+
+===============================================================================================================================================================
+3.
+
+cqlsh:iacsd0923> update store
+             ... set hobbies=hobbies-['design']
+             ... where cid=2;
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname  | email                    | hobbies                    | mobile       | purchaseveh
+-----+--------+--------------------------+----------------------------+--------------+-------------------------------
+   5 | jitesh | ('qt@g.com', 'ur@g.com') | ['photograpy', 'sleeping'] | {8888, 9999} |    {'creata': 18, 'hero': 13}
+   1 |  rahul | ('rk@g.com', 'cj@g.com') |     ['Reading', 'Cooking'] | {7345, 9423} |     {'hero': 12, 'honda': 11}
+   2 | suresh | ('sk@g.com', 'yu@g.com') |      ['riding', 'drawing'] | {7589, 9400} | {'pular': 12, 'splendor': 11}
+   4 | ramesh | ('jk@g.com', 'ty@g.com') | ['photograpy', 'sleeping'] | {4489, 7810} |        {'kia': 12, 'tvs': 11}
+  12 |   null |                     null |      ['design', 'drawing'] |         null |                          null
+   3 | rajesh |   ('s@g.com', 'u@g.com') |               ['treaking'] |   {89, 8769} |    {'acess': 11, 'pular': 12}
+
+(6 rows)
+===============================================================================================================================================
+
+4.
+
+cqlsh:iacsd0923> update store
+             ... set cname='rajan'
+             ... where cid=1;
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname  | email                    | hobbies                    | mobile       | purchaseveh
+-----+--------+--------------------------+----------------------------+--------------+-------------------------------
+   5 | jitesh | ('qt@g.com', 'ur@g.com') | ['photograpy', 'sleeping'] | {8888, 9999} |    {'creata': 18, 'hero': 13}
+   1 |  rajan | ('rk@g.com', 'cj@g.com') |     ['Reading', 'Cooking'] | {7345, 9423} |     {'hero': 12, 'honda': 11}
+   2 | suresh | ('sk@g.com', 'yu@g.com') |      ['riding', 'drawing'] | {7589, 9400} | {'pular': 12, 'splendor': 11}
+   4 | ramesh | ('jk@g.com', 'ty@g.com') | ['photograpy', 'sleeping'] | {4489, 7810} |        {'kia': 12, 'tvs': 11}
+  12 |   null |                     null |      ['design', 'drawing'] |         null |                          null
+   3 | rajesh |   ('s@g.com', 'u@g.com') |               ['treaking'] |   {89, 8769} |    {'acess': 11, 'pular': 12}
+
+(6 rows)
+
+=================================================================================================================================================
+
+5.
+
+cqlsh:iacsd0923> update store
+             ... set email=('suresh@gmail.com')
+             ... where cid=2;
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname  | email                      | hobbies                    | mobile       | purchaseveh
+-----+--------+----------------------------+----------------------------+--------------+-------------------------------
+   5 | jitesh |   ('qt@g.com', 'ur@g.com') | ['photograpy', 'sleeping'] | {8888, 9999} |    {'creata': 18, 'hero': 13}
+   1 |  rajan |   ('rk@g.com', 'cj@g.com') |     ['Reading', 'Cooking'] | {7345, 9423} |     {'hero': 12, 'honda': 11}
+   2 | suresh | ('suresh@gmail.com', None) |      ['riding', 'drawing'] | {7589, 9400} | {'pular': 12, 'splendor': 11}
+   4 | ramesh |   ('jk@g.com', 'ty@g.com') | ['photograpy', 'sleeping'] | {4489, 7810} |        {'kia': 12, 'tvs': 11}
+  12 |   null |                       null |      ['design', 'drawing'] |         null |                          null
+   3 | rajesh |     ('s@g.com', 'u@g.com') |               ['treaking'] |   {89, 8769} |    {'acess': 11, 'pular': 12}
+
+(6 rows)
+
+=======================================================================================================================================================
+6.
+
+cqlsh:iacsd0923> Delete purchaseveh['hero'] from store where cid=1;
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname  | email                      | hobbies                    | mobile       | purchaseveh
+-----+--------+----------------------------+----------------------------+--------------+-------------------------------
+   5 | jitesh |   ('qt@g.com', 'ur@g.com') | ['photograpy', 'sleeping'] | {8888, 9999} |    {'creata': 18, 'hero': 13}
+   1 |  rajan |   ('rk@g.com', 'cj@g.com') |     ['Reading', 'Cooking'] | {7345, 9423} |                 {'honda': 11}
+   2 | suresh | ('suresh@gmail.com', None) |      ['riding', 'drawing'] | {7589, 9400} | {'pular': 12, 'splendor': 11}
+   4 | ramesh |   ('jk@g.com', 'ty@g.com') | ['photograpy', 'sleeping'] | {4489, 7810} |        {'kia': 12, 'tvs': 11}
+  12 |   null |                       null |      ['design', 'drawing'] |         null |                          null
+   3 | rajesh |     ('s@g.com', 'u@g.com') |               ['treaking'] |   {89, 8769} |    {'acess': 11, 'pular': 12}
+
+(6 rows)
+
+===========================================================================================================================================
+
+7.
+
+
+cqlsh:iacsd0923> delete hobbies[1]
+             ... from store
+             ... where cid=1;
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname  | email                      | hobbies                    | mobile       | purchaseveh
+-----+--------+----------------------------+----------------------------+--------------+-------------------------------
+   5 | jitesh |   ('qt@g.com', 'ur@g.com') | ['photograpy', 'sleeping'] | {8888, 9999} |    {'creata': 18, 'hero': 13}
+   1 |  rajan |   ('rk@g.com', 'cj@g.com') |                ['Reading'] | {7345, 9423} |                 {'honda': 11}
+   2 | suresh | ('suresh@gmail.com', None) |      ['riding', 'drawing'] | {7589, 9400} | {'pular': 12, 'splendor': 11}
+   4 | ramesh |   ('jk@g.com', 'ty@g.com') | ['photograpy', 'sleeping'] | {4489, 7810} |        {'kia': 12, 'tvs': 11}
+  12 |   null |                       null |      ['design', 'drawing'] |         null |                          null
+   3 | rajesh |     ('s@g.com', 'u@g.com') |               ['treaking'] |   {89, 8769} |    {'acess': 11, 'pular': 12}
+
+(6 rows)
+
+=================================================================================================================================================
+
+QUE 2:
+
+
+cqlsh:iacsd0923> begin batch
+             ...
+             ... insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(6,'simaran',{77777,88888},('s@g.com','i@g.com'),{'alto':20,'hondacivic':81},['jogging']);
+             ...
+             ... insert into store(cid,cname,mobile,email,purchaseveh,hobbies)
+             ... values(7,'shweta',{1010,5555},('swe@g.com','ta@g.com'),{'BMW':131,'Audi':118},['outing'])
+             ...
+             ... delete from store
+             ... where cid=3;
+             ...
+             ... delete email from store
+             ... where cid=1;
+             ...
+             ... update store
+             ... set email=('1001@gmail.com','2001@gmail.com')
+             ... where cid=2;
+             ...
+             ... apply batch;
+cqlsh:iacsd0923> select *from store;
+
+ cid | cname   | email                                | hobbies                    | mobile         | purchaseveh
+-----+---------+--------------------------------------+----------------------------+----------------+--------------------------------
+   5 |  jitesh |             ('qt@g.com', 'ur@g.com') | ['photograpy', 'sleeping'] |   {8888, 9999} |                 {'activa': 18}
+   1 |   rajan |                                 null |                ['Reading'] |   {7345, 9423} |                  {'honda': 11}
+   2 |  suresh | ('1001@gmail.com', '2001@gmail.com') |      ['riding', 'drawing'] |   {7589, 9400} |  {'pular': 12, 'splendor': 11}
+   4 |  ramesh |             ('jk@g.com', 'ty@g.com') | ['photograpy', 'sleeping'] |   {4489, 7810} |         {'kia': 12, 'tvs': 11}
+   7 |  shweta |            ('swe@g.com', 'ta@g.com') |                 ['outing'] |   {1010, 5555} |      {'Audi': 118, 'BMW': 131}
+   6 | simaran |               ('s@g.com', 'i@g.com') |                ['jogging'] | {77777, 88888} | {'alto': 20, 'hondacivic': 81}
+
+(6 rows)
+
+========================================================================================================================================================
+
+
+lsh:iacsd0923> create type department(deptno int,dname text);
+cqlsh:iacsd0923> alter type department
+             ... add dloc varchar;
+cqlsh:iacsd0923> create table emp(eid int,ename text,sal int, project list<text>,dept department);
+
+
+
+
+
+cqlsh:iacsd0923> desc emp_2;
+
+CREATE TABLE iacsd0923.emp_2 (
+    eid int PRIMARY KEY,
+    dept department,
+    ename text,
+    project list<text>,
+    sal int
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+
+
+lsh:iacsd0923> insert into emp_2 (eid,dept,ename,project,sal)
+             ... values(11,{deptno:1,dname:'P1',dloc:'Pune'},'aaaa',['mining'],1000);
+cqlsh:iacsd0923> select *from emp_2;
+
+ eid | dept                                   | ename | project    | sal
+-----+----------------------------------------+-------+------------+------
+  11 | {deptno: 1, dname: 'P1', dloc: 'Pune'} |  aaaa | ['mining'] | 1000
+
+(1 rows)
+cqlsh:iacsd0923> insert into emp_2 (eid,dept,ename,project,sal)
+             ... values(12,{deptno:2,dname:'P2',dloc:'Mumbai'},'bbbb',['analyst'],2000);
+cqlsh:iacsd0923> insert into emp_2 (eid,dept,ename,project,sal)
+             ... values(13,{deptno:3,dname:'P3',dloc:'Nagpur'},'cccc',['drilling'],3000);
+cqlsh:iacsd0923> insert into emp_2 (eid,dept,ename,project,sal)
+             ... values(14,{deptno:4,dname:'P4',dloc:'mirzapur'},'dddd',['devops'],4000);
+cqlsh:iacsd0923> insert into emp_2 (eid,dept,ename,project,sal)
+             ... values(15,{deptno:5,dname:'P5',dloc:'banglore'},'eeee',['data_analyst'],7000);
+cqlsh:iacsd0923> select *from emp_2;
+
+ eid | dept                                       | ename | project          | sal
+-----+--------------------------------------------+-------+------------------+------
+  13 |   {deptno: 3, dname: 'P3', dloc: 'Nagpur'} |  cccc |     ['drilling'] | 3000
+  11 |     {deptno: 1, dname: 'P1', dloc: 'Pune'} |  aaaa |       ['mining'] | 1000
+  15 | {deptno: 5, dname: 'P5', dloc: 'banglore'} |  eeee | ['data_analyst'] | 7000
+  14 | {deptno: 4, dname: 'P4', dloc: 'mirzapur'} |  dddd |       ['devops'] | 4000
+  12 |   {deptno: 2, dname: 'P2', dloc: 'Mumbai'} |  bbbb |      ['analyst'] | 2000
+
+(5 rows)
